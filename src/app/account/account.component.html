@@ -1,0 +1,37 @@
+<div class="flex w-9 flex-column gap-3 p-2 pt-6 m-auto">
+
+  <h1>Your IPs:</h1>
+
+  <p-card [header]="ownedIP.name" *ngFor="let ownedIP of userStore.data()?.intellectualProperties">
+    <ng-template pTemplate="subtitle">
+      <p class="m-0">Registered By: {{ ownedIP.owner.name }} <small>({{ ownedIP.owner.ethAddress }})</small></p>
+    </ng-template>
+
+    <div class="flex gap-2 align-items-center">
+      <p class="m-0 flex-1">{{ ownedIP.description }}</p>
+      <div class="flex flex-column gap-3">
+        <p-button [disabled]="true" icon="pi pi-dollar" [label]="(ownedIP.price / 1000000000000000000).toString() + ' ETH'" severity="success" />
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <small>{{ ownedIP.createdAt | date: 'medium' }}</small>
+    </ng-template>
+  </p-card>
+</div>
+
+<p-divider></p-divider>
+
+<div class="absolute top-0 right-0 w-6rem h-4rem m-4 mr-7">
+
+  <p-button
+    [routerLink]="['/dashboard']"
+    >Dashboard</p-button>
+
+</div>
+
+<div class="absolute top-0 left-0 w-11rem h-8rem m-3 mt-5" *ngIf="userStore.data()?.balance">
+
+ <p-badge class="relative" [value]="$any(userStore.data()?.balance) / 1000000000000000000 + ' ETH'" severity="success" />
+
+</div>

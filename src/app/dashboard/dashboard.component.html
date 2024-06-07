@@ -1,0 +1,148 @@
+<div class="flex w-9 flex-column gap-3 p-2 pt-6 m-auto">
+
+  <div class="flex gap-3">
+
+    <p-iconField iconPosition="left" class="flex-1">
+      <p-inputIcon styleClass="pi pi-search" />
+      <input (keyup)="publicIPStore.updateQuery($any($event.target).value)" class="w-full" type="text" pInputText placeholder="Search" />
+    </p-iconField>
+
+    <p-toggleButton
+      (onChange)="publicIPStore.updateOrder($event.checked ? 'desc' : 'asc')"
+      onLabel="Current date order: Desc"
+      offLabel="Current date order: Asc"
+      onIcon="pi pi-sort-amount-down"
+      offIcon="pi pi-sort-amount-up"
+      iconPos="right"
+      />
+
+      <p-button icon="pi pi-refresh" severity="info" (onClick)="publicIPStore.loadAll()" [loading]="publicIPStore.isLoading()" />
+
+      <p-button icon="pi pi-upload" label="Upload new IP" severity="info" (onClick)="isDialogOpen = true" [loading]="publicIPStore.isLoading()" />
+  </div>
+
+  <p-divider></p-divider>
+
+  <p-card [header]="publicIP.name" *ngFor="let publicIP of publicIPStore.sortedAndFilteredIps()">
+    <ng-template pTemplate="subtitle">
+      <p class="m-0">Registered By: {{ publicIP.owner.name }} <small>({{ publicIP.owner.ethAddress }})</small></p>
+    </ng-template>
+
+    <div class="flex gap-2 align-items-center">
+      <p class="m-0 flex-1">{{ publicIP.description }}</p>
+      <p-tag [value]="(publicIP.price / 1000000000000000000).toString() + ' ETH'" />
+    </div>
+
+    <ng-template pTemplate="footer">
+      <small>{{ publicIP.createdAt | date: 'medium' }}</small>
+    </ng-template>
+  </p-card>
+</div>
+
+<div class="absolute top-0 right-0 w-4rem h-4rem m-3" *ngIf="userStore.data()?.balance">
+  <p-avatar
+  [routerLink]="['/account']"
+  icon="pi pi-user"
+  [label]="$any(userStore.data()?.name).charAt(0).toUpperCase()"
+  size="xlarge"
+  [style]="{ 'background-color': '#ece9fc', color: '#2a1261' }"
+  shape="circle"
+ />
+</div>
+
+<div class="absolute top-0 right-0 w-3rem h-4rem mt-8 m-3 pt-3">
+  <!-- Logout button -->
+  <p-button
+    [routerLink]="['/auth']"
+    icon="pi pi-sign-out"
+    (onClick)="userStore.logout()"
+    class="w-full"
+    severity="danger"></p-button>
+
+</div>
+
+<div class="absolute top-0 left-0 w-11rem h-8rem m-3 mt-5" *ngIf="userStore.data()?.balance">
+
+ <p-badge class="relative" [value]="$any(userStore.data()?.balance) / 1000000000000000000 + ' ETH'" severity="success" />
+
+</div>
+
+<p-dialog header="Upload a new IP" [modal]="true" [(visible)]="isDialogOpen">
+
+  <form #uploadForm="ngForm" *ngIf="!userStore.isLoading()">
+
+    <div class="flex flex-column gap-5 mt-4">
+
+      <p-floatLabel styleClass="w-full">
+        <input pInputText class="w-full" name="name" ngModel required autocomplete="off" />
+        <label>IP name</label>
+      </p-floatLabel>
+
+      <p-floatLabel styleClass="w-full">
+        <textarea
+            rows="5" cols="30"
+            ngModel
+            class="w-full"
+            name="description"
+            required
+            pInputTextarea>
+        </textarea>
+        <label>Description</label>
+      </p-floatLabel>
+
+      <p-inputNumber
+          [required]="true"
+          styleClass="w-full"
+          [ngModel]="0"
+          name="price"
+          [showButtons]="true"
+          buttonLayout="horizontal"
+          spinnerMode="horizontal"
+          [min]="0"
+          [minFractionDigits]="1"
+          [maxFractionDigits]="10"
+          mode="decimal"
+          [step]="0.0001"
+          decrementButtonClass="p-button-danger"
+          incrementButtonClass="p-button-success"
+          incrementButtonIcon="pi pi-plus"
+          decrementButtonIcon="pi pi-minus"
+          suffix="ETH" />
+
+          <p-fileUpload
+            url="https://www.primefaces.org/cdn/api/upload.php"
+            (onUpload)="uploadedFile = $event.files[0]"
+            [multiple]="false"
+            maxFileSize="1000000">
+                <ng-template pTemplate="content">
+                    <ul *ngIf="uploadedFile">
+                      {{ uploadedFile.name }} - {{ uploadedFile.size }} bytes
+                    </ul>
+                </ng-template>
+          </p-fileUpload>
+
+      <div class="flex justify-content-end gap-2">
+          <p-button label="Cancel" severity="secondary" (click)="isDialogOpen = false" />
+          <p-button label="Upload" (onClick)="isDialogOpen =false; isUploading=true; userStore.uploadIP(uploadForm, $any(uploadedFile))" [disabled]="uploadForm.invalid || !uploadedFile" />
+      </div>
+
+    </div>
+
+  </form>
+
+</p-dialog>
+
+<p-dialog header="Upload a new IP" [modal]="true" [visible]="isUploading && userStore.isLoading()" [closable]="false">
+
+  <div class="flex flex-column align-items-center justify-content-center gap-2" *ngIf="userStore.isLoading()">
+    <p-progressSpinner
+      styleClass="w-4rem h-4rem"
+      strokeWidth="8"
+      fill="var(--surface-ground)"
+      animationDuration=".5s" />
+
+    <p>This process may take minutes, please wait</p>
+  </div>
+
+
+</p-dialog>

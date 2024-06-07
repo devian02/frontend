@@ -1,0 +1,95 @@
+<div class="flex align-items-center justify-content-center h-100" *ngIf="showSignIn" [@fadeInOnEnter] [@fadeOutOnLeave]>
+  <p-card header="Sign In">
+
+    <form #signInForm="ngForm">
+
+      <div class="flex flex-column gap-4">
+
+        <p-iconField iconPosition="left">
+          <p-inputIcon styleClass="pi pi-user" />
+          <input type="text" ngModel name="user" pInputText placeholder="Name or email" required />
+        </p-iconField>
+
+        <p-iconField iconPosition="left">
+          <p-inputIcon styleClass="pi pi-lock" />
+          <input type="password" ngModel name="password" pInputText placeholder="Password" required />
+        </p-iconField>
+
+        <button
+            pButton
+            [loading]="isSigningIn"
+            label="Sign In"
+            (click)="onSignIn(signInForm)"
+            [disabled]="signInForm.invalid"
+            class="p-button-primary">
+        </button>
+
+        <p-divider align="center">
+          <b>Or</b>
+        </p-divider>
+
+        <button
+            pButton
+            label="Sign Up"
+            (click)="showSignIn = false; showSignUp = true"
+            type="button"
+            class="p-button-secondary">
+        </button>
+
+      </div>
+
+    </form>
+  </p-card>
+
+</div>
+
+
+<div class="flex align-items-center justify-content-center h-100" *ngIf="showSignUp" [@fadeInOnEnter] [@fadeOutOnLeave]>
+  <p-card header="Sign Up">
+
+    <form #signUpForm="ngForm">
+
+      <div class="flex flex-column gap-4">
+
+        <p-iconField iconPosition="left">
+          <p-inputIcon styleClass="pi pi-envelope" />
+          <input type="text" ngModel name="email" pInputText placeholder="Email" required email />
+        </p-iconField>
+
+        <p-iconField iconPosition="left">
+          <p-inputIcon styleClass="pi pi-user" />
+          <input type="text" ngModel name="name" pInputText placeholder="Name" required />
+        </p-iconField>
+
+        <p-iconField iconPosition="left">
+          <p-inputIcon styleClass="pi pi-lock" />
+          <input type="password" ngModel name="password" pInputText placeholder="Password" required />
+        </p-iconField>
+
+        <button
+            pButton
+            [loading]="isSigningUp"
+            label="Sign Up"
+            (click)="onSignUp(signUpForm)"
+            [disabled]="signUpForm.invalid"
+            class="p-button-primary">
+        </button>
+
+        <p-divider align="center">
+          <b>Or</b>
+        </p-divider>
+
+        <button
+            pButton
+            label="Sign In"
+            type="button"
+            (click)="showSignIn = true; showSignUp = false"
+            class="p-button-secondary">
+        </button>
+
+      </div>
+
+    </form>
+  </p-card>
+
+</div>
